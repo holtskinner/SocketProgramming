@@ -6,6 +6,7 @@
 
   Client Side
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -47,7 +48,7 @@ int main () {
 
     //send message to server
     ssize_t status = send(network_socket, input, sizeof(input), 0);
-    
+
     //End loop wconnection is closed by server
     if (status == -1) {
       break;

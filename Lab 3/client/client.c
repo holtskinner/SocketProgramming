@@ -9,12 +9,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <sys/types.h>
 #include <sys/socket.h>
-
 #include <netinet/in.h>
-
 #define PORT 14311
 
 int main () {
@@ -45,7 +42,6 @@ int main () {
   while (1) {
 
     scanf("%s\n", input);
-
     //send message to server
     ssize_t status = send(network_socket, input, sizeof(input), 0);
 
@@ -53,6 +49,7 @@ int main () {
     if (status == -1) {
       break;
     }
+
     //Recieve data from server
     char server_response[256];
     recv(network_socket, &server_response, sizeof(server_response), 0);
@@ -61,12 +58,7 @@ int main () {
     printf("%s\n", server_response);
 
   }
-
   //Close Socket
   close(network_socket);
   return 0;
-}
-
-void menu() {
-
 }

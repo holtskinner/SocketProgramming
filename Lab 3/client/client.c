@@ -16,7 +16,7 @@
 
 #define PORT 14311
 
-int main() {
+int main () {
 
   //create socket
   int network_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -35,16 +35,37 @@ int main() {
 
   if (connection_status == -1) {
     printf("Connection Error\n");
+    return 1;
   }
 
-  //Recieve data from server
-  char server_response[256];
-  recv(network_socket, &server_response, sizeof(server_response), 0);
+  printf("My chat room client. Version One.\n");
+  char input[256];
 
-  //Print out recieved data
-  printf("%s\n", server_response);
+  while (1) {
+
+    scanf("%s\n", input);
+
+    //send message to server
+    ssize_t status = send(network_socket, input, sizeof(input), 0);
+    
+    //End loop wconnection is closed by server
+    if (status == -1) {
+      break;
+    }
+    //Recieve data from server
+    char server_response[256];
+    recv(network_socket, &server_response, sizeof(server_response), 0);
+
+    //Print out recieved data
+    printf("%s\n", server_response);
+
+  }
 
   //Close Socket
   close(network_socket);
   return 0;
+}
+
+void menu() {
+
 }

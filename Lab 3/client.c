@@ -3,6 +3,8 @@
   Holt Skinner
   11-4-2016
   Chat Room with one client Using Socket API in C
+
+  Client Side
 */
 #include <stdio.h>
 #include <stdlib.h>

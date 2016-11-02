@@ -56,6 +56,12 @@ int login (char username[], char password[]) {
 }
 //Return 1 if user created, 0 otherwise
 int create_new_user (char username[], char password[]) {
+    if (strlen(user_id) >= 32 || strlen(user_id) <= 0) {
+      return 0;
+    }
+    if (strlen(password) > 8 || strlen(password) < 4) {
+      return 0;
+    }
     //Arrays of usernames & passwords
     char usernames[256][256];
     char passwords[256][256];
@@ -64,10 +70,9 @@ int create_new_user (char username[], char password[]) {
     int number_of_users = read_file(usernames, passwords);
     if (number_of_users == 0) {
       printf("Error Reading File\n");
-      return 1;
+      return 0;
     }
     number_of_users++; //Account for off by one
-
     int i = 0;
 
     //Search existing users for username
@@ -147,13 +152,14 @@ int main () {
   int login_result = 0;
   action = strtok(client_request," ");//Parse Action
 
+  //Forward action
   switch (action) {
     case "login":
       user_id = strtok(client_request," "); //Get user ID from request
       password = strtok(client_request," ");
       login_result = login(user_id, password);
       if (login_result == 1) {
-        server_message = "Tom login.\n";
+        server_message = "Login.\n";
       } else {
         server_message = "Invalid User.\n";
       }
@@ -163,6 +169,29 @@ int main () {
       user_id = strtok(client_request," "); //Get user ID from request
       password = strtok(client_request," ");
 
+      if (create_new_user(user_id, password) == 1) {
+        server_message = "User Created";
+      } else {
+        server_message = "User Could not be Created";
+      }
+      break;
+
+    case "send":
+      if (login_result != 1) {
+        server_message = "Not logged in";
+        break;
+      }
+      message = strtok(client_request, " ");
+      server_message = user_id;
+      strcat(server_message, " ");
+      strcat(server_message, message);
+
+      break;
+
+    case "logout":
+      login_result = 0;
+      server_message = "Logout"
+      break;
 
     default:
       printf("Invalid Command\n");

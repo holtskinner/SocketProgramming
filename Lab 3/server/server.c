@@ -28,7 +28,7 @@ int read_file (char usernames[][], char passwords[][]) {
     fscanf(fp, "(%s, %s)", usernames[i], passwords[i]);
     i++;
   }
-
+  fclose(fp);
   return i; //Number of users ()
 }
 
@@ -67,7 +67,26 @@ int create_new_user (char username[], char password[]) {
       return 1;
     }
     number_of_users++; //Account for off by one
-      
+
+    int i = 0;
+
+    //Search existing users for username
+    for (i = 0; i < number_of_users; i++) {
+      if (username == usernames[i]) {
+        return 0; //Invalid user
+      }
+    }
+
+    FILE* fp = fopen("users.txt", "w");
+
+    while (!feof(fp)) {
+      fscanf(fp, "(%s, %s)", usernames[i], passwords[i]);
+      i++;
+    }
+
+    fprintf(fp, "(%s, %s)", username, password); //Add user to file
+    fclose(fp);
+    return 1;//User created
 }
 
 int main () {
@@ -106,6 +125,7 @@ int main () {
 
   while (1) {
     client_socket = accept(server_socket, NULL, NULL); //Last two parameters left as NULL becuase it's all local
+
     if (client_socket == SOCKET_ERROR) {
       printf("accept() error \n");
       close(client_socket);

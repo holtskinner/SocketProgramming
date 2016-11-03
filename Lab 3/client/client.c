@@ -46,9 +46,9 @@ int main () {
     ssize_t status = send(network_socket, input, sizeof(input), 0);
 
     //End loop wconnection is closed by server
-    if (status == -1) {
-      break;
-    }
+    // if (status == -1) {
+    //   break;
+    // }
 
     //Recieve data from server
     char server_response[256];

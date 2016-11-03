@@ -132,53 +132,62 @@ int main () {
 
     printf( "Client Connected.\n");
 
-  //Get request from client
-  char client_request[MAX_LINE];
-  int length = recv(client_socket, client_request, MAX_LINE, 0);
-  client_request[length] = 0; //End string with a NULL terminator
+    //Get request from client
+    char client_request[MAX_LINE];
+    int length = recv(client_socket, client_request, MAX_LINE, 0);
+    client_request[length] = 0; //End string with a NULL terminator
 
-  int login_result = 0;
-  //action = strtok(client_request," ");//Parse Action
-  strcpy(action, strtok(client_request," "));
-  //Forward action
-  if (action == "login") {
-    user_id = strtok(client_request," "); //Get user ID from request
-    password = strtok(client_request," ");
-    login_result = login(user_id, password);
-    if (login_result == 1) {
-      char server_message[MAX_LINE] = "Login";
+    int login_result = 0;
+    //action = strtok(client_request," ");//Parse Action
+    strcpy(action, strtok(client_request," "));
+    //Forward action
+    if (action == "login") {
+
+      user_id = strtok(client_request," "); //Get user ID from request
+      password = strtok(client_request," ");
+      login_result = login(user_id, password);
+      if (login_result == 1) {
+        char server_message[MAX_LINE] = "Login";
+      } else {
+        char server_message[MAX_LINE] = "Invalid User";
+      }
+
+    } else if (action == "newuser") {
+
+      char user_id[32] = strtok(client_request," "); //Get user ID from request
+      char password[8] = strtok(client_request," "); //Get password from request
+
+      if (create_new_user(user_id, password) == 1) {
+        char server_message[MAX_LINE] = "User Created";
+      } else {
+        char server_message[MAX_LINE] = "User Could not be Created";
+      }
+
+    } else if (action == "send") {
+
+      if (login_result != 1) {
+        char server_message[MAX_LINE] = "Not logged in";
+      }
+
+      char message[MAX_LINE] = strtok(client_request, " ");
+      char server_message[MAX_LINE] = user_id;
+      strcat(server_message, " ");
+      strcat(server_message, message);
+
+    } else if (action == "logout") {
+
+      login_result = 0;
+      server_message = "Logout"
+
     } else {
-      char server_message[MAX_LINE] = "Invalid User";
-    }
-    break;
-  } else if (action == "newuser") {
-    char user_id[32] = strtok(client_request," "); //Get user ID from request
-    char password[8] = strtok(client_request," ");
 
-    if (create_new_user(user_id, password) == 1) {
-      char server_message[MAX_LINE] = "User Created";
-    } else {
-      char server_message[MAX_LINE] = "User Could not be Created";
-    }
-  } else if (action == "send") {
-    if (login_result != 1) {
-      char server_message[MAX_LINE] = "Not logged in";
-      break;
-    }
-    char message[MAX_LINE] = strtok(client_request, " ");
-    char server_message[MAX_LINE] = user_id;
-    strcat(server_message, " ");
-    strcat(server_message, message);
-  } else if (action == "logout") {
-    login_result = 0;
-    server_message = "Logout"
-  } else {
-    printf("Invalid Command\n");
-  }
+      printf("Invalid Command\n");
+      
+    } //End routing
 
-  //send message
-  send(client_socket, server_message, sizeof(server_message), 0);
-  close(client_socket);
+    //send message
+    send(client_socket, server_message, sizeof(server_message), 0);
+    close(client_socket);
 
 } //End While
 

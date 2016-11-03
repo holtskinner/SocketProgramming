@@ -47,9 +47,17 @@ int login (char username[], char password[]) {
     number_of_users++; //Account for off by one
 
     int i = 0;
+    int tempUser = 0, tempPass = 0;
     for (i = 0; i < number_of_users; i++) {
-      if (username == usernames[i] && password == passwords[i]) {
-        return 1; //Valid user
+      // if (username == usernames[i] && password == passwords[i]) {
+      //   return 1; //Valid user
+      // }
+
+      tempUser = strcmp(username, usernames[i]);
+      tempPass = strcmp(password, passwords[i]);
+
+      if (tempUser == 0 && tempPass == 0) {
+        return 1;
       }
     }
     return 0; //Invalid user
@@ -74,11 +82,14 @@ int create_new_user (char username[], char password[]) {
     }
     number_of_users++; //Account for off by one
     int i = 0;
-
+    int tempUser = 0;
     //Search existing users for username
     for (i = 0; i < number_of_users; i++) {
-      if (username == usernames[i]) {
-        return 0; //Invalid user
+
+      tempUser = strcmp(username, usernames[i]);
+
+      if (tempUser == 0) {
+        return 0; //User already exists
       }
     }
 
@@ -95,9 +106,6 @@ int create_new_user (char username[], char password[]) {
 }
 
 int main () {
-
-  //Output to client
-  char server_message[256];
 
   //create server socket
   int server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -129,10 +137,6 @@ int main () {
   int length = recv(client_socket, client_request, MAX_LINE, 0);
   client_request[length] = 0; //End string with a NULL terminator
 
-  char action[32];
-  char user_id[32];
-  char password[8];
-  char message[256];
   int login_result = 0;
   //action = strtok(client_request," ");//Parse Action
   strcpy(action, strtok(client_request," "));
@@ -142,27 +146,27 @@ int main () {
     password = strtok(client_request," ");
     login_result = login(user_id, password);
     if (login_result == 1) {
-      server_message = "Login";
+      char server_message[MAX_LINE] = "Login";
     } else {
-      server_message = "Invalid User";
+      char server_message[MAX_LINE] = "Invalid User";
     }
     break;
   } else if (action == "newuser") {
-    user_id = strtok(client_request," "); //Get user ID from request
-    password = strtok(client_request," ");
+    char user_id[32] = strtok(client_request," "); //Get user ID from request
+    char password[8] = strtok(client_request," ");
 
     if (create_new_user(user_id, password) == 1) {
-      server_message = "User Created";
+      char server_message[MAX_LINE] = "User Created";
     } else {
-      server_message = "User Could not be Created";
+      char server_message[MAX_LINE] = "User Could not be Created";
     }
   } else if (action == "send") {
     if (login_result != 1) {
-      server_message = "Not logged in";
+      char server_message[MAX_LINE] = "Not logged in";
       break;
     }
-    message = strtok(client_request, " ");
-    server_message = user_id;
+    char message[MAX_LINE] = strtok(client_request, " ");
+    char server_message[MAX_LINE] = user_id;
     strcat(server_message, " ");
     strcat(server_message, message);
   } else if (action == "logout") {

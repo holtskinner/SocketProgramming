@@ -29,7 +29,7 @@ int read_file (char usernames[MAX_LINE][MAX_LINE], char passwords[MAX_LINE][MAX_
     i++;
   }
   fclose(fp);
-  return i; //Number of users ()
+  return i; //Number of users
 }
 
 // Return 1 if valid user, 0 otherwise
@@ -49,9 +49,6 @@ int login (char username[], char password[]) {
     int i = 0;
     int tempUser = 0, tempPass = 0;
     for (i = 0; i < number_of_users; i++) {
-      // if (username == usernames[i] && password == passwords[i]) {
-      //   return 1; //Valid user
-      // }
 
       tempUser = strcmp(username, usernames[i]);
       tempPass = strcmp(password, passwords[i]);
@@ -182,7 +179,7 @@ int main () {
     } else {
 
       printf("Invalid Command\n");
-      
+
     } //End routing
 
     //send message

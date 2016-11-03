@@ -134,17 +134,17 @@ int main () {
   char password[8];
   char message[256];
   int login_result = 0;
-  action = strtok(client_request," ");//Parse Action
-
+  //action = strtok(client_request," ");//Parse Action
+  strcopy(action, strtok(client_request," "));
   //Forward action
   if (action == "login") {
     user_id = strtok(client_request," "); //Get user ID from request
     password = strtok(client_request," ");
     login_result = login(user_id, password);
     if (login_result == 1) {
-      server_message = "Login.\n";
+      server_message = "Login";
     } else {
-      server_message = "Invalid User.\n";
+      server_message = "Invalid User";
     }
     break;
   } else if (action == "newuser") {

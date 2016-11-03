@@ -20,7 +20,7 @@
 #define MAX_LINE      256
 
 //returns size of arrays
-int read_file (char usernames[][], char passwords[][]) {
+int read_file (char usernames[MAX_LINE][MAX_LINE], char passwords[MAX_LINE][MAX_LINE]) {
   int i = 0;
   FILE* fp = fopen("users.txt", "r+");
 
@@ -48,7 +48,7 @@ int login (char username[], char password[]) {
 
     int i = 0;
     for (i = 0; i < number_of_users; i++) {
-      if (username == usernames[i] && password == password[i]) {
+      if (username == usernames[i] && password == passwords[i]) {
         return 1; //Valid user
       }
     }
@@ -56,7 +56,7 @@ int login (char username[], char password[]) {
 }
 //Return 1 if user created, 0 otherwise
 int create_new_user (char username[], char password[]) {
-    if (strlen(user_id) >= 32 || strlen(user_id) <= 0) {
+    if (strlen(username) >= 32 || strlen(username) <= 0) {
       return 0;
     }
     if (strlen(password) > 8 || strlen(password) < 4) {
@@ -109,19 +109,10 @@ int main () {
   server_address.sin_addr.s_addr = INADDR_ANY; //local
 
   //Bind to recieve response
-  if (bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) == SOCKET_ERROR) {
-    close(server_socket);
-    WSACleanup();
-    return 1;
-  };
+  bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address));
 
   //Wait for response
-  if (listen(server_socket, MAX_PENDING) == SOCKET_ERROR) {
-    printf( "Error listening on socket.\n");
-    close(server_socket);
-    WSACleanup();
-    return 1;
-  }
+  listen(server_socket, MAX_PENDING);
 
   //Get response from client
   int client_socket;
@@ -131,14 +122,7 @@ int main () {
   while (1) {
     client_socket = accept(server_socket, NULL, NULL); //Last two parameters left as NULL becuase it's all local
 
-    if (client_socket == SOCKET_ERROR) {
-      printf("accept() error \n");
-      close(client_socket);
-      WSACleanup();
-      return 1;
-    }
-
-  printf( "Client Connected.\n");
+    printf( "Client Connected.\n");
 
   //Get request from client
   char client_request[MAX_LINE];
@@ -153,48 +137,39 @@ int main () {
   action = strtok(client_request," ");//Parse Action
 
   //Forward action
-  switch (action) {
-    case "login":
-      user_id = strtok(client_request," "); //Get user ID from request
-      password = strtok(client_request," ");
-      login_result = login(user_id, password);
-      if (login_result == 1) {
-        server_message = "Login.\n";
-      } else {
-        server_message = "Invalid User.\n";
-      }
+  if (action == "login") {
+    user_id = strtok(client_request," "); //Get user ID from request
+    password = strtok(client_request," ");
+    login_result = login(user_id, password);
+    if (login_result == 1) {
+      server_message = "Login.\n";
+    } else {
+      server_message = "Invalid User.\n";
+    }
+    break;
+  } else if (action == "newuser") {
+    user_id = strtok(client_request," "); //Get user ID from request
+    password = strtok(client_request," ");
+
+    if (create_new_user(user_id, password) == 1) {
+      server_message = "User Created";
+    } else {
+      server_message = "User Could not be Created";
+    }
+  } else if (action == "send") {
+    if (login_result != 1) {
+      server_message = "Not logged in";
       break;
-
-    case "newuser":
-      user_id = strtok(client_request," "); //Get user ID from request
-      password = strtok(client_request," ");
-
-      if (create_new_user(user_id, password) == 1) {
-        server_message = "User Created";
-      } else {
-        server_message = "User Could not be Created";
-      }
-      break;
-
-    case "send":
-      if (login_result != 1) {
-        server_message = "Not logged in";
-        break;
-      }
-      message = strtok(client_request, " ");
-      server_message = user_id;
-      strcat(server_message, " ");
-      strcat(server_message, message);
-
-      break;
-
-    case "logout":
-      login_result = 0;
-      server_message = "Logout"
-      break;
-
-    default:
-      printf("Invalid Command\n");
+    }
+    message = strtok(client_request, " ");
+    server_message = user_id;
+    strcat(server_message, " ");
+    strcat(server_message, message);
+  } else if (action == "logout") {
+    login_result = 0;
+    server_message = "Logout"
+  } else {
+    printf("Invalid Command\n");
   }
 
   //send message

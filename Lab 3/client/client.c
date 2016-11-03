@@ -41,7 +41,7 @@ int main () {
 
   while (1) {
 
-    scanf("%s\n", input);
+    fgets(input, 256, stdin);
     //send message to server
     ssize_t status = send(network_socket, input, sizeof(input), 0);
 

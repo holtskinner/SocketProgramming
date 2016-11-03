@@ -135,7 +135,7 @@ int main () {
   char message[256];
   int login_result = 0;
   //action = strtok(client_request," ");//Parse Action
-  strcopy(action, strtok(client_request," "));
+  strcpy(action, strtok(client_request," "));
   //Forward action
   if (action == "login") {
     user_id = strtok(client_request," "); //Get user ID from request

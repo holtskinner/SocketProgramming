@@ -158,7 +158,7 @@ int main () {
       login_result = login(user_id, password);
 
       if (login_result == 1) {
-        server_message = "You are logged in!\n";
+        server_message = "Logged in\n";
       } else {
         server_message = "Invalid User\n";
       }

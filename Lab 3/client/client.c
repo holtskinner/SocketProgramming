@@ -39,7 +39,7 @@ int main () {
   printf("My chat room client. Version One.\n");
 
   char input[256];
-  char server_response[256];
+  char* server_response;
 
   while (1) {
 

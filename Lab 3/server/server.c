@@ -30,10 +30,9 @@ int login (char* username, char* password) {
 
     int number_of_users = 0;
     int i = 0;
+
     for (i = 0; !feof(fp); i++) {
       fscanf(fp, "%s %s\n", usernames[i], passwords[i]);
-      printf("Username: %s\n", usernames[i]);
-      printf("Password: %s\n", passwords[i]);
     }
 
     number_of_users = i;

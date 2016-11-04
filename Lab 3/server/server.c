@@ -127,10 +127,10 @@ int main () {
   //Get response from client
   char server_message[MAX_LINE]; //Sent from server to client
   char client_request[MAX_LINE]; //From client to server
-  char user_id[32];
-  char password[8];
-  char message[MAX_LINE];
-  char action[MAX_LINE];
+  char *user_id;
+  char *password;
+  char *message;
+  char *action;
 
   while (1) {
 
@@ -139,7 +139,7 @@ int main () {
 
     int login_result = 0;
 
-    strcpy(action, strtok(client_request," ")); //Parse Action
+    action = strtok(client_request, " "); //Parse Action
 
     //strcpy(server_message, client_request);
     //printf("%s\n", server_message);
@@ -154,8 +154,8 @@ int main () {
       // password = strtok(client_request," ");
       printf("%s\n", "login");
 
-      strcpy(user_id, strtok(NULL, " ")); //Get user ID from request
-      strcpy(password, strtok(NULL, " "));
+      user_id = strtok(NULL, " "); //Get user ID from request
+      password = strtok(NULL, " ");
 
       printf("%s\n", user_id);
       printf("%s\n", password);

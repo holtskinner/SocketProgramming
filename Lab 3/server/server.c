@@ -19,19 +19,6 @@
 #define MAX_PENDING   5
 #define MAX_LINE      256
 
-//returns size of arrays
-int read_file (char usernames[MAX_LINE][MAX_LINE], char passwords[MAX_LINE][MAX_LINE]) {
-  int i = 0;
-  FILE* fp = fopen("users.txt", "r+");
-
-  while (!feof(fp)) {
-    fscanf(fp, "(%s, %s)", usernames[i], passwords[i]);
-    i++;
-  }
-  fclose(fp);
-  return i; //Number of users
-}
-
 // Return 1 if valid user, 0 otherwise
 int login (char* username, char* password) {
 
@@ -39,17 +26,25 @@ int login (char* username, char* password) {
     char usernames[256][256];
     char passwords[256][256];
 
-    //If no usernames or passwords are read in, an error occured
-    int number_of_users = read_file(usernames, passwords);
+    FILE* fp = fopen("users.txt", "r");
+
+    int number_of_users = 0;
+    int i = 0;
+    for (i = 0; !feof(fp); i++) {
+      fscanf(fp, "%s %s\n", usernames[i], passwords[i]);
+      printf("Username: %s\n", usernames[i]);
+      printf("Password: %s\n", passwords[i]);
+    }
+
+    number_of_users = i;
+
+    fclose(fp);
 
     if (number_of_users == 0) {
       printf("Error Reading File\n");
       return 1;
     }
 
-    number_of_users++; //Account for off by one
-
-    int i = 0;
     int tempUser = 0, tempPass = 0;
     for (i = 0; i < number_of_users; i++) {
 
@@ -72,17 +67,28 @@ int create_new_user (char username[], char password[]) {
       return 0;
     }
     //Arrays of usernames & passwords
-    char usernames[256][256];
-    char passwords[256][256];
+    char usernames[256][256] = {};
+    char passwords[256][256] = {};
 
-    //If no usernames or passwords are read in, an error occured
-    int number_of_users = read_file(usernames, passwords);
+    FILE* fp = fopen("users.txt", "r");
+
+    int number_of_users = 0;
+    int i = 0;
+    for (i = 0; !feof(fp); i++) {
+      fscanf(fp, "(%s, %s)", usernames[i], passwords[i]);
+      printf("Username: %s\n", usernames[i]);
+      printf("Password: %s\n", passwords[i]);
+    }
+
+    number_of_users = i;
+
+    fclose(fp);
+
     if (number_of_users == 0) {
       printf("Error Reading File\n");
       return 0;
     }
-    number_of_users++; //Account for off by one
-    int i = 0;
+
     int tempUser = 0;
     //Search existing users for username
     for (i = 0; i < number_of_users; i++) {
@@ -94,15 +100,15 @@ int create_new_user (char username[], char password[]) {
       }
     }
 
-    FILE* fp = fopen("users.txt", "w");
+    FILE* fp2 = fopen("users.txt", "w");
 
-    while (!feof(fp)) {
-      fscanf(fp, "(%s, %s)", usernames[i], passwords[i]);
+    while (!feof(fp2)) {
+      fscanf(fp2, "(%s, %s)", usernames[i], passwords[i]);
       i++;
     }
 
-    fprintf(fp, "(%s, %s)", username, password); //Add user to file
-    fclose(fp);
+    fprintf(fp2, "(%s, %s)", username, password); //Add user to file
+    fclose(fp2);
     return 1;//User created
 }
 
@@ -153,9 +159,9 @@ int main () {
       login_result = login(user_id, password);
 
       if (login_result == 1) {
-        server_message = "Login";
+        server_message = "You are logged in!\n";
       } else {
-        server_message = "Invalid User";
+        server_message = "Invalid User\n";
       }
     }
     // } else if (strcmp(action, "newuser")) {

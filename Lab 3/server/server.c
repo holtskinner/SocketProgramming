@@ -136,28 +136,29 @@ int main () {
 
     //Get request from client
     recv(client_socket, client_request, MAX_LINE, 0);
-    client_request[MAX_LINE - 1] = '\0'; //End string with a NULL terminator
-
 
     int login_result = 0;
 
-    while (1) {
-      strtok(client_request," ")
-    }
     strcpy(action, strtok(client_request," ")); //Parse Action
 
-    strcpy(server_message, client_request);
+    //strcpy(server_message, client_request);
     //printf("%s\n", server_message);
 
     //Forward action
+    // int result = strcmp(action, "login");
+    // printf("%d\n", result);
 
-    if (strcmp(action, "login")) {
+    if (strcmp(action, "login") == 0) {
 
       // user_id = strtok(client_request," ");
       // password = strtok(client_request," ");
+      printf("%s\n", "login");
 
-      strcpy(user_id, strtok(client_request," ")); //Get user ID from request
-      strcpy(password, strtok(client_request," "));
+      strcpy(user_id, strtok(NULL, " ")); //Get user ID from request
+      strcpy(password, strtok(NULL, " "));
+
+      printf("%s\n", user_id);
+      printf("%s\n", password);
 
       login_result = login(user_id, password);
       if (login_result == 1) {

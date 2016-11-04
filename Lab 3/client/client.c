@@ -48,14 +48,17 @@ int main () {
     //send message to server
     send(network_socket, input, sizeof(input), 0);
 
-    //Recieve data from server
-    recv(network_socket, server_response, sizeof(server_response), 0);
+    //Recieve data from server, end loop when server closes
+    if (recv(network_socket, server_response, sizeof(server_response), 0) == 0) {
+      break;
+    }
 
     //Print out recieved data
     printf("%s\n", server_response);
 
   }
   //Close Socket
-  close(network_socket);
+  printf("Bye!\n");
+  shutdown(network_socket, 2);
   return 0;
 }

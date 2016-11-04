@@ -145,29 +145,18 @@ int main () {
 
     action = strtok(client_request, " "); //Parse Action
 
-    //strcpy(server_message, client_request);
-    //printf("%s\n", server_message);
-
-    //Forward action
-    // int result = strcmp(action, "login");
-    // printf("%d\n", result);
-
     if (strcmp(action, "login") == 0) {
-
-      printf("%s\n", "login");
 
       user_id = strtok(NULL, " "); //Get user ID from request
       password = strtok(NULL, " ");
 
-      // login_result = login(user_id, password);
-      //
-      // if (login_result == 1) {
-      //   strcpy(server_message, "Login");
-      //   // server_message[MAX_LINE] = "Login";
-      // } else {
-      //   strcpy(server_message, "Invalid User");
-      //   //char server_message[MAX_LINE] = "Invalid User";
-      // }
+      login_result = login(user_id, password);
+
+      if (login_result == 1) {
+        server_message = "Login";
+      } else {
+        server_message = "Invalid User";
+      }
     }
     // } else if (strcmp(action, "newuser")) {
     //     strcpy(user_id, strtok(client_request," ")); //Get user ID from request
@@ -207,7 +196,9 @@ int main () {
     send(client_socket, server_message, sizeof(server_message), 0);
 
 } //End While
-  close (client_socket);
-  close (server_socket);
+  // close (client_socket);
+  // close (server_socket);
+  shutdown(client_socket, 2);
+  shutdown(server_socket, 2);
   return 0;
 }

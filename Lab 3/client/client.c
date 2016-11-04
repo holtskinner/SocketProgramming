@@ -46,12 +46,7 @@ int main () {
     fgets(input, 256, stdin);
 
     //send message to server
-    ssize_t status = send(network_socket, input, sizeof(input), 0);
-
-    //End loop wconnection is closed by server
-    // if (status == -1) {
-    //   break;
-    // }
+    send(network_socket, input, sizeof(input), 0);
 
     //Recieve data from server
     recv(network_socket, server_response, sizeof(server_response), 0);

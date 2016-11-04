@@ -33,17 +33,20 @@ int read_file (char usernames[MAX_LINE][MAX_LINE], char passwords[MAX_LINE][MAX_
 }
 
 // Return 1 if valid user, 0 otherwise
-int login (char username[], char password[]) {
+int login (char* username, char* password) {
+
     //Arrays of usernames & passwords
     char usernames[256][256];
     char passwords[256][256];
 
     //If no usernames or passwords are read in, an error occured
     int number_of_users = read_file(usernames, passwords);
+
     if (number_of_users == 0) {
       printf("Error Reading File\n");
       return 1;
     }
+
     number_of_users++; //Account for off by one
 
     int i = 0;
@@ -59,6 +62,7 @@ int login (char username[], char password[]) {
     }
     return 0; //Invalid user
 }
+
 //Return 1 if user created, 0 otherwise
 int create_new_user (char username[], char password[]) {
     if (strlen(username) >= 32 || strlen(username) <= 0) {
@@ -125,7 +129,7 @@ int main () {
   printf( "Client Connected.\n");
 
   //Get response from client
-  char server_message[MAX_LINE]; //Sent from server to client
+  char *server_message; //Sent from server to client
   char client_request[MAX_LINE]; //From client to server
   char *user_id;
   char *password;
@@ -150,24 +154,20 @@ int main () {
 
     if (strcmp(action, "login") == 0) {
 
-      // user_id = strtok(client_request," ");
-      // password = strtok(client_request," ");
       printf("%s\n", "login");
 
       user_id = strtok(NULL, " "); //Get user ID from request
       password = strtok(NULL, " ");
 
-      printf("%s\n", user_id);
-      printf("%s\n", password);
-
-      login_result = login(user_id, password);
-      if (login_result == 1) {
-        strcpy(server_message, "Login");
-        // server_message[MAX_LINE] = "Login";
-      } else {
-        strcpy(server_message, "Invalid User");
-        //char server_message[MAX_LINE] = "Invalid User";
-      }
+      // login_result = login(user_id, password);
+      //
+      // if (login_result == 1) {
+      //   strcpy(server_message, "Login");
+      //   // server_message[MAX_LINE] = "Login";
+      // } else {
+      //   strcpy(server_message, "Invalid User");
+      //   //char server_message[MAX_LINE] = "Invalid User";
+      // }
     }
     // } else if (strcmp(action, "newuser")) {
     //     strcpy(user_id, strtok(client_request," ")); //Get user ID from request
@@ -204,7 +204,7 @@ int main () {
     // } //End routing
 
     //send message
-    send (client_socket, server_message, sizeof(server_message), 0);
+    send(client_socket, server_message, sizeof(server_message), 0);
 
 } //End While
   close (client_socket);

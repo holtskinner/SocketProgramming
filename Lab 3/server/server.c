@@ -119,32 +119,38 @@ int main () {
   //Wait for response
   listen(server_socket, MAX_PENDING);
 
+  printf( "Waiting for a client to connect...\n" );
+
+  int client_socket = accept(server_socket, NULL, NULL); //Last two parameters left as NULL becuase it's all local
+  printf( "Client Connected.\n");
+
   //Get response from client
-  int client_socket;
-  char server_message [MAX_LINE];
+  char server_message[MAX_LINE]; //Sent from server to client
+  char client_request[MAX_LINE]; //From client to server
   char user_id[32];
   char password[8];
   char message[MAX_LINE];
   char action[MAX_LINE];
 
-  printf( "Waiting for a client to connect...\n" );
-
   while (1) {
-    client_socket = accept(server_socket, NULL, NULL); //Last two parameters left as NULL becuase it's all local
-
-    printf( "Client Connected.\n");
 
     //Get request from client
-    char client_request[MAX_LINE];
-    int length = recv(client_socket, client_request, MAX_LINE, 0);
-    //client_request[length] = 0; //End string with a NULL terminator
-    //printf("%s\n", client_request);
+    recv(client_socket, client_request, MAX_LINE, 0);
+    client_request[MAX_LINE - 1] = '\0'; //End string with a NULL terminator
+
 
     int login_result = 0;
 
+    while (1) {
+      strtok(client_request," ")
+    }
     strcpy(action, strtok(client_request," ")); //Parse Action
-    
+
+    strcpy(server_message, client_request);
+    //printf("%s\n", server_message);
+
     //Forward action
+
     if (strcmp(action, "login")) {
 
       // user_id = strtok(client_request," ");
@@ -161,47 +167,46 @@ int main () {
         strcpy(server_message, "Invalid User");
         //char server_message[MAX_LINE] = "Invalid User";
       }
-
-    } else if (strcmp(action, "newuser")) {
-        strcpy(user_id, strtok(client_request," ")); //Get user ID from request
-        strcpy(password, strtok(client_request," ")); //Get password from request
-
-        if (create_new_user(user_id, password) == 1) {
-          strcpy(server_message, "User Created");
-        } else {
-          strcpy(server_message, "User could not be Created");
-        }
-
-    } else if (strcmp(action, "send")) {
-
-      if (login_result != 1) {
-        strcpy(server_message, "Not Logged In");
-        break;
-      }
-
-      strcpy(message, strtok(client_request, " ")); //get message to be sent
-      strcpy(server_message, user_id);
-
-      strcat(server_message, " ");
-      strcat(server_message, message);
-
-    } else if (strcmp(action, "logout")) {
-
-      login_result = 0;
-      strcpy(server_message, "Logout");
-
-    } else {
-
-      strcpy(server_message, "Invalid");
-
-    } //End routing
+    }
+    // } else if (strcmp(action, "newuser")) {
+    //     strcpy(user_id, strtok(client_request," ")); //Get user ID from request
+    //     strcpy(password, strtok(client_request," ")); //Get password from request
+    //
+    //     if (create_new_user(user_id, password) == 1) {
+    //       strcpy(server_message, "User Created");
+    //     } else {
+    //       strcpy(server_message, "User could not be Created");
+    //     }
+    //
+    // } else if (strcmp(action, "send")) {
+    //
+    //   if (login_result != 1) {
+    //     strcpy(server_message, "Not Logged In");
+    //     break;
+    //   }
+    //
+    //   strcpy(message, strtok(client_request, " ")); //get message to be sent
+    //   strcpy(server_message, user_id);
+    //
+    //   strcat(server_message, " ");
+    //   strcat(server_message, message);
+    //
+    // } else if (strcmp(action, "logout")) {
+    //
+    //   login_result = 0;
+    //   strcpy(server_message, "Logout");
+    //
+    // } else {
+    //
+    //   strcpy(server_message, "Invalid");
+    //
+    // } //End routing
 
     //send message
     send (client_socket, server_message, sizeof(server_message), 0);
-    close (client_socket);
 
 } //End While
-
+  close (client_socket);
   close (server_socket);
   return 0;
 }

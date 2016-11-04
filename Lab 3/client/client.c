@@ -37,7 +37,9 @@ int main () {
   }
 
   printf("My chat room client. Version One.\n");
+
   char input[256];
+  char server_response[256];
 
   while (1) {
 
@@ -51,8 +53,7 @@ int main () {
     // }
 
     //Recieve data from server
-    char server_response[256];
-    recv(network_socket, &server_response, sizeof(server_response), 0);
+    recv(network_socket, server_response, sizeof(server_response), 0);
 
     //Print out recieved data
     printf("%s\n", server_response);

@@ -102,12 +102,13 @@ int main () {
   printf( "Client Connected.\n");
 
   //Get response from client
-  char* server_message = NULL; //Sent from server to client
+  char* server_message = malloc(sizeof(char) * MAX_LINE); //Sent from server to client
   char client_request[MAX_LINE]; //From client to server
   char* user_id = NULL;
   char* password = NULL;
   char* message = NULL;
   char* action = NULL;
+  int login_result = 0;
 
   while (1) {
 
@@ -115,7 +116,7 @@ int main () {
     if (recv(client_socket, client_request, sizeof(client_request), 0) == 0) {
       break;
     }
-    int login_result = 0;
+
     action = strtok(client_request, "\n"); //Parse Single Word Responses
     action = strtok(client_request, " "); //Parse Multiple Word Responses
 
@@ -128,7 +129,7 @@ int main () {
           login_result = login(user_id, password);
 
           if (login_result == 1) {
-            server_message = "Login\0";
+            server_message = "Success\0";
           } else {
             server_message = "Not User\0";
           }
@@ -136,7 +137,7 @@ int main () {
     } else if (strcmp(action, "logout") == 0) { //Logout
           if(login_result == 1) { //If Logged in
             login_result = 0;
-            server_message = "Logout!\0";
+            server_message = "Success\0";
           } else { //If not logged in
             server_message = "Invalid\0";
           }
@@ -145,28 +146,21 @@ int main () {
           password = strtok(NULL, "\n");
 
           if (create_new_user(user_id, password) == 1) {
-            server_message = "New User\0";
+            server_message = "Success\0";
           } else {
             server_message = "Error\0";
           }
+    } else if (strcmp(action, "send") == 0) {
+
+          if (login_result != 1) {
+            server_message = "Fail\0";
+          } else {
+            message = strtok(NULL, "\n");
+            strcat(server_message, user_id);
+            strcat(server_message, ": ");
+            strcat(server_message, message);
+          }
     }
-    // else if (strcmp(action, "send") == 0) {
-    //       if (login_result != 1) {
-    //         server_message = "Login!\0";
-    //         break;
-    //       }
-    //
-    //       message = strtok(NULL, "\n");
-    //
-    // }
-    //
-    //   strcpy(message, strtok(client_request, " ")); //get message to be sent
-    //   strcpy(server_message, user_id);
-    //
-    //   strcat(server_message, " ");
-    //   strcat(server_message, message);
-    //
-    // }
     else { //Other
           server_message = "Invalid\0";
     }

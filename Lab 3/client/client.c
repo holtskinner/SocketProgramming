@@ -12,7 +12,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#define PORT 14311
+#define PORT      14311
+#define MAX_LINE  256
 
 int main () {
 
@@ -39,7 +40,7 @@ int main () {
   printf("My chat room client. Version One.\n");
 
   char input[256];
-  char* server_response;
+  char* server_response = malloc(sizeof(char) * MAX_LINE);
 
   while (1) {
 
@@ -59,6 +60,7 @@ int main () {
   }
   //Close Socket
   printf("Bye!\n");
+  free(server_response);
   shutdown(network_socket, 2);
   return 0;
 }

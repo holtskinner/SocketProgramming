@@ -134,7 +134,7 @@ int main () {
   printf( "Client Connected.\n");
 
   //Get response from client
-  char *server_message; //Sent from server to client
+  char* server_message = malloc(sizeof(char) * MAX_LINE); //Sent from server to client
   char client_request[MAX_LINE]; //From client to server
   char *user_id;
   char *password;
@@ -144,8 +144,10 @@ int main () {
   while (1) {
 
     //Get request from client
-    recv(client_socket, client_request, MAX_LINE, 0);
-
+    //recv(client_socket, client_request, MAX_LINE, 0);
+    if (recv(client_socket, client_request, sizeof(client_request), 0) == 0) {
+      break;
+    }
     int login_result = 0;
 
     action = strtok(client_request, " "); //Parse Action
@@ -158,9 +160,9 @@ int main () {
       login_result = login(user_id, password);
 
       if (login_result == 1) {
-        server_message = "Logged in\n";
+        server_message = "Logged in! \0";
       } else {
-        server_message = "Invalid User\n";
+        server_message = "Invalid User! \0";
       }
     }
     // } else if (strcmp(action, "newuser")) {
@@ -201,8 +203,9 @@ int main () {
     send(client_socket, server_message, sizeof(server_message), 0);
 
 } //End While
-  // close (client_socket);
-  // close (server_socket);
+
+  printf("%s\n", "Client Disconnected");
+
   shutdown(client_socket, 2);
   shutdown(server_socket, 2);
   return 0;

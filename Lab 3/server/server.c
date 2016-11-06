@@ -119,7 +119,7 @@ int main () {
 
     action = strtok(client_request, " "); //Parse Multiple Word Responses
 
-    if (!action) {
+    if (!action) { //Error check and exit gracefully if anything happens
       break;
     }
     if (strcmp(action, "exit") == 0) { //end gracefully
@@ -127,7 +127,6 @@ int main () {
     } else if (strcmp(action, "login") == 0) { //Login
           asprintf(&user_id, "%s", strtok(NULL, " "));
           password = strtok(NULL, "\n");
-
           login_result = login(user_id, password);
 
           if (login_result == 1) {
@@ -153,7 +152,7 @@ int main () {
           }
     } else if (strcmp(action, "send") == 0) {
 
-          if (login_result != 1) {
+          if (login_result != 1) { //Checks if user is logged in
             server_message = "Fail\0";
           } else {
             message = strtok(NULL, "\n");

@@ -148,12 +148,8 @@ int main () {
       break;
     }
     int login_result = 0;
-    action = strtok(client_request, "\n"); //Parse Action
-    action = strtok(client_request, " "); //Parse Action
-    //If there is no input or just one word
-    if(action == NULL) {
-
-    }
+    action = strtok(client_request, "\n"); //Parse Single Word Responses
+    action = strtok(client_request, " "); //Parse Multiple Word Responses
 
     if (strcmp(action, "exit") == 0) { //end gracefully
       break;
@@ -169,8 +165,12 @@ int main () {
         server_message = "Not User\0";
       }
     } else if (strcmp(action, "logout") == 0) { //Logout
-      login_result = 0;
-      server_message = "Logout!\0";
+      if(login_result == 1) { //If Logged in
+        login_result = 0;
+        server_message = "Logout!\0";
+      } else { //If not logged in
+        server_message = "Invalid\0";
+      }
     } else { //Other
       server_message = "Invalid\0";
     }

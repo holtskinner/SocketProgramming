@@ -50,7 +50,7 @@ int main () {
     send(network_socket, input, sizeof(input), 0);
 
     //Recieve data from server, end loop when server closes
-    if (recv(network_socket, server_response, sizeof(server_response), 0) == 0) {
+    if (recv(network_socket, server_response, MAX_LINE, 0) == 0) {
       break;
     }
 

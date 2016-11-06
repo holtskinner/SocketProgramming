@@ -134,7 +134,7 @@ int main () {
   printf( "Client Connected.\n");
 
   //Get response from client
-  char* server_message = malloc(sizeof(char) * MAX_LINE); //Sent from server to client
+  char* server_message; //Sent from server to client
   char client_request[MAX_LINE]; //From client to server
   char *user_id;
   char *password;
@@ -143,27 +143,36 @@ int main () {
 
   while (1) {
 
-    //Get request from client
-    //recv(client_socket, client_request, MAX_LINE, 0);
+    //Get request from client, leave if client quits
     if (recv(client_socket, client_request, sizeof(client_request), 0) == 0) {
       break;
     }
     int login_result = 0;
-
+    action = strtok(client_request, "\n"); //Parse Action
     action = strtok(client_request, " "); //Parse Action
+    //If there is no input or just one word
+    if(action == NULL) {
 
-    if (strcmp(action, "login") == 0) {
+    }
 
+    if (strcmp(action, "exit") == 0) { //end gracefully
+      break;
+    } else if (strcmp(action, "login") == 0) { //Login
       user_id = strtok(NULL, " "); //Get user ID from request
-      password = strtok(NULL, " ");
+      password = strtok(NULL, "\n");
 
       login_result = login(user_id, password);
 
       if (login_result == 1) {
-        server_message = "Logged in! \0";
+        server_message = "Login\0";
       } else {
-        server_message = "Invalid User! \0";
+        server_message = "Not User\0";
       }
+    } else if (strcmp(action, "logout") == 0) { //Logout
+      login_result = 0;
+      server_message = "Logout!\0";
+    } else { //Other
+      server_message = "Invalid\0";
     }
     // } else if (strcmp(action, "newuser")) {
     //     strcpy(user_id, strtok(client_request," ")); //Get user ID from request
@@ -188,12 +197,7 @@ int main () {
     //   strcat(server_message, " ");
     //   strcat(server_message, message);
     //
-    // } else if (strcmp(action, "logout")) {
-    //
-    //   login_result = 0;
-    //   strcpy(server_message, "Logout");
-    //
-    // } else {
+    // }  else {
     //
     //   strcpy(server_message, "Invalid");
     //
@@ -205,6 +209,7 @@ int main () {
 } //End While
 
   printf("%s\n", "Client Disconnected");
+  //free(server_message);
 
   shutdown(client_socket, 2);
   shutdown(server_socket, 2);

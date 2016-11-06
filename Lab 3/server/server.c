@@ -21,7 +21,6 @@
 
 // Return 1 if valid user, 0 otherwise
 int login (char* username, char* password) {
-
     //Arrays of usernames & passwords
     char usernames[256][256];
     char passwords[256][256];
@@ -44,7 +43,7 @@ int login (char* username, char* password) {
       return 1;
     }
 
-    int tempUser = 0, tempPass = 0;
+    int tempUser = 1, tempPass = 1;
     for (i = 0; i < number_of_users; i++) {
 
       tempUser = strcmp(username, usernames[i]);
@@ -58,57 +57,26 @@ int login (char* username, char* password) {
 }
 
 //Return 1 if user created, 0 otherwise
-int create_new_user (char username[], char password[]) {
-    if (strlen(username) >= 32 || strlen(username) <= 0) {
+int create_new_user (char* username, char* password) {
+
+    if (strlen(username) > 32 || strlen(username) <= 0) {
       return 0;
     }
     if (strlen(password) > 8 || strlen(password) < 4) {
       return 0;
     }
-    //Arrays of usernames & passwords
-    char usernames[256][256] = {};
-    char passwords[256][256] = {};
 
-    FILE* fp = fopen("users.txt", "r");
-
-    int number_of_users = 0;
-    int i = 0;
-    for (i = 0; !feof(fp); i++) {
-      fscanf(fp, "(%s, %s)", usernames[i], passwords[i]);
-      printf("Username: %s\n", usernames[i]);
-      printf("Password: %s\n", passwords[i]);
-    }
-
-    number_of_users = i;
-
-    fclose(fp);
-
-    if (number_of_users == 0) {
-      printf("Error Reading File\n");
+    //check if user already exists
+    if (login(username, password) == 1) {
       return 0;
     }
 
-    int tempUser = 0;
-    //Search existing users for username
-    for (i = 0; i < number_of_users; i++) {
+    FILE* fp = fopen("users.txt", "a");
 
-      tempUser = strcmp(username, usernames[i]);
+    fprintf(fp, "%s %s\n", username, password); //Add user to file
+    fclose(fp);
 
-      if (tempUser == 0) {
-        return 0; //User already exists
-      }
-    }
-
-    FILE* fp2 = fopen("users.txt", "w");
-
-    while (!feof(fp2)) {
-      fscanf(fp2, "(%s, %s)", usernames[i], passwords[i]);
-      i++;
-    }
-
-    fprintf(fp2, "(%s, %s)", username, password); //Add user to file
-    fclose(fp2);
-    return 1;//User created
+    return 1; //User created
 }
 
 int main () {
@@ -134,12 +102,12 @@ int main () {
   printf( "Client Connected.\n");
 
   //Get response from client
-  char* server_message; //Sent from server to client
+  char* server_message = NULL; //Sent from server to client
   char client_request[MAX_LINE]; //From client to server
-  char *user_id;
-  char *password;
-  char *message;
-  char *action;
+  char* user_id = NULL;
+  char* password = NULL;
+  char* message = NULL;
+  char* action = NULL;
 
   while (1) {
 
@@ -154,42 +122,43 @@ int main () {
     if (strcmp(action, "exit") == 0) { //end gracefully
       break;
     } else if (strcmp(action, "login") == 0) { //Login
-      user_id = strtok(NULL, " "); //Get user ID from request
-      password = strtok(NULL, "\n");
+          user_id = strtok(NULL, " "); //Get user ID from request
+          password = strtok(NULL, "\n");
 
-      login_result = login(user_id, password);
+          login_result = login(user_id, password);
 
-      if (login_result == 1) {
-        server_message = "Login\0";
-      } else {
-        server_message = "Not User\0";
-      }
+          if (login_result == 1) {
+            server_message = "Login\0";
+          } else {
+            server_message = "Not User\0";
+          }
+
     } else if (strcmp(action, "logout") == 0) { //Logout
-      if(login_result == 1) { //If Logged in
-        login_result = 0;
-        server_message = "Logout!\0";
-      } else { //If not logged in
-        server_message = "Invalid\0";
-      }
-    } else { //Other
-      server_message = "Invalid\0";
+          if(login_result == 1) { //If Logged in
+            login_result = 0;
+            server_message = "Logout!\0";
+          } else { //If not logged in
+            server_message = "Invalid\0";
+          }
+    } else if (strcmp(action, "newuser") == 0) {
+          user_id = strtok(NULL, " "); //Get user ID from request
+          password = strtok(NULL, "\n");
+
+          if (create_new_user(user_id, password) == 1) {
+            server_message = "New User\0";
+          } else {
+            server_message = "Error\0";
+          }
     }
-    // } else if (strcmp(action, "newuser")) {
-    //     strcpy(user_id, strtok(client_request," ")); //Get user ID from request
-    //     strcpy(password, strtok(client_request," ")); //Get password from request
+    // else if (strcmp(action, "send") == 0) {
+    //       if (login_result != 1) {
+    //         server_message = "Login!\0";
+    //         break;
+    //       }
     //
-    //     if (create_new_user(user_id, password) == 1) {
-    //       strcpy(server_message, "User Created");
-    //     } else {
-    //       strcpy(server_message, "User could not be Created");
-    //     }
+    //       message = strtok(NULL, "\n");
     //
-    // } else if (strcmp(action, "send")) {
-    //
-    //   if (login_result != 1) {
-    //     strcpy(server_message, "Not Logged In");
-    //     break;
-    //   }
+    // }
     //
     //   strcpy(message, strtok(client_request, " ")); //get message to be sent
     //   strcpy(server_message, user_id);
@@ -197,12 +166,10 @@ int main () {
     //   strcat(server_message, " ");
     //   strcat(server_message, message);
     //
-    // }  else {
-    //
-    //   strcpy(server_message, "Invalid");
-    //
-    // } //End routing
-
+    // }
+    else { //Other
+          server_message = "Invalid\0";
+    }
     //send message
     send(client_socket, server_message, sizeof(server_message), 0);
 

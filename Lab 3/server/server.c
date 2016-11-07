@@ -1,8 +1,8 @@
 /*
   Lab 3 (Part 1) - Socket Programming
   Holt Skinner
-  11-4-2016
-  Chat Room with one client Using Socket API in C
+  11-7-2016
+  Chat Room with one client Using TCP Socket API in C
 
   Server Side
 */
